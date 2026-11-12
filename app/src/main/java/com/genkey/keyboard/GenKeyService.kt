@@ -590,13 +590,15 @@ class GenKeyService : InputMethodService() {
         val h2 = "@#&*-!?()"
         "asdfghjkl".forEachIndexed { i, ch ->
             val s = ch.toString()
-            r2.addView(key(if (shift) s.uppercase() else s, c2[i], 1f, h2[i].toString()) { typeLetter(s) })
-        }
-        root.addView(r2)
+        r2.addView(key(if (shift) s.uppercase() else s, c2[i], 1f, h2[i].toString()) {
+    commit(s)
+})
+}
+            root.addView(r2)
 
         val r3 = row()
         r3.addView(key(if (shift) "⇪" else "⇧", YELLOW, 1.5f) {
             shift = !shift
             render()
         })
-        val c3 = listOf(DARK, YELLOW, WHITE, RED,
+        val c3 = listOf(DARK, YELLOW, WHITE, RED)
