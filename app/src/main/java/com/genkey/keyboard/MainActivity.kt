@@ -5,9 +5,12 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.provider.Settings
 import android.text.InputType
+import android.view.Gravity
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -32,9 +35,10 @@ class MainActivity : Activity() {
     private fun title(s: String) {
         val t = TextView(this)
         t.text = s
-        t.textSize = 16f
+        t.textSize = 18f
+        t.typeface = Typeface.DEFAULT_BOLD
         t.setTextColor(0xFFE3B33A.toInt())
-        t.setPadding(0, dp(22), 0, dp(6))
+        t.setPadding(0, dp(22), 0, dp(10))
         box.addView(t)
     }
 
@@ -70,8 +74,7 @@ class MainActivity : Activity() {
                 val b = Button(this)
                 b.text = n
                 b.isAllCaps = false
-                b.layoutParams =
-                    LinearLayout.LayoutParams(0, WRAP, 1f)
+                b.layoutParams = LinearLayout.LayoutParams(0, WRAP, 1f)
 
                 b.setOnClickListener {
                     sp.edit().putInt(key, idx).apply()
@@ -87,25 +90,145 @@ class MainActivity : Activity() {
 
         paint()
     }
+    private fun previewKey(
+        parent: LinearLayout,
+        text: String,
+        color: Int,
+        weight: Float,
+        theme: KTheme
+    ) {
+        val key = TextView(this)
+        key.text = text
+        key.textSize = 10f
+        key.gravity = Gravity.CENTER
+        key.setTextColor(Themes.textOn(color))
+        key.typeface = Typeface.DEFAULT_BOLD
 
+        val shape = GradientDrawable()
+        shape.setColor(color)
+        shape.cornerRadius = dp(5).toFloat()
+        key.background = shape
+
+        val lp = LinearLayout.LayoutParams(0, dp(27), weight)
+        lp.setMargins(dp(2), dp(2), dp(2), dp(2))
+        parent.addView(key, lp)
+    }
+
+    private fun themePreview(theme: KTheme): LinearLayout {
+        val preview = LinearLayout(this)
+        preview.orientation = LinearLayout.VERTICAL
+        preview.setPadding(dp(5), dp(5), dp(5), dp(5))
+        preview.setBackgroundColor(theme.bg)
+
+        val first = LinearLayout(this)
+        first.gravity = Gravity.CENTER
+        preview.addView(first)
+
+        listOf("Q", "W", "E", "R", "T", "Y").forEachIndexed { i, s ->
+            previewKey(first, s, theme.keys[i % 5], 1f, theme)
+        }
+
+        val second = LinearLayout(this)
+        second.gravity = Gravity.CENTER
+        preview.addView(second)
+
+        listOf("A", "S", "D", "F", "G").forEachIndexed { i, s ->
+            previewKey(second, s, theme.keys[(i + 1) % 5], 1f, theme)
+        }
+
+        val third = LinearLayout(this)
+        third.gravity = Gravity.CENTER
+        preview.addView(third)
+
+        previewKey(third, "⌫", theme.keys[3], 1f, theme)
+        previewKey(third, "GENKEY", theme.keys[2], 2.5f, theme)
+        previewKey(third, "↵", theme.keys[4], 1f, theme)
+
+        return preview
+    }
+
+    private fun themeCards() {
+        val selected = sp.getInt("theme", 0)
+
+        Themes.list.forEachIndexed { index, theme ->
+            val card = LinearLayout(this)
+            card.orientation = LinearLayout.VERTICAL
+            card.setPadding(dp(10), dp(10), dp(10), dp(10))
+
+            val shape = GradientDrawable()
+            shape.cornerRadius = dp(14).toFloat()
+            shape.setColor(0xFF171717.toInt())
+            shape.setStroke(
+                dp(if (index == selected) 2 else 1),
+                if (index == selected) 0xFFE3B33A.toInt()
+                else 0xFF444444.toInt()
+            )
+            card.background = shape
+
+            val heading = LinearLayout(this)
+            heading.orientation = LinearLayout.HORIZONTAL
+            heading.gravity = Gravity.CENTER_VERTICAL
+
+            val name = TextView(this)
+            name.text = theme.name
+            name.textSize = 16f
+            name.typeface = Typeface.DEFAULT_BOLD
+            name.setTextColor(Color.WHITE)
+            name.layoutParams =
+                LinearLayout.LayoutParams(0, WRAP, 1f)
+            heading.addView(name)
+
+            val status = TextView(this)
+            status.text = if (index == selected) "✓ Selected" else "Preview"
+            status.textSize = 12f
+            status.setTextColor(
+                if (index == selected) 0xFFE3B33A.toInt()
+                else 0xFFAAAAAA.toInt()
+            )
+            heading.addView(status)
+
+            card.addView(heading)
+
+            val preview = themePreview(theme)
+            val previewParams = LinearLayout.LayoutParams(MATCH, WRAP)
+            previewParams.topMargin = dp(8)
+            card.addView(preview, previewParams)
+
+            card.setOnClickListener {
+                sp.edit().putInt("theme", index).apply()
+                recreate()
+            }
+
+            val params = LinearLayout.LayoutParams(MATCH, WRAP)
+            params.bottomMargin = dp(10)
+            box.addView(card, params)
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         sp = getSharedPreferences("genkey", MODE_PRIVATE)
 
         val scroll = ScrollView(this)
-        scroll.setBackgroundColor(Color.BLACK)
+        scroll.setBackgroundColor(0xFF101010.toInt())
 
         box = LinearLayout(this)
         box.orientation = LinearLayout.VERTICAL
-        box.setPadding(dp(20), dp(24), dp(20), dp(40))
+        box.setPadding(dp(18), dp(24), dp(18), dp(40))
         scroll.addView(box)
 
         val head = TextView(this)
         head.text = "GENKEY"
         head.textSize = 32f
+        head.typeface = Typeface.DEFAULT_BOLD
         head.setTextColor(Color.WHITE)
         box.addView(head)
+
+        val sub = TextView(this)
+        sub.text = "Make typing beautiful."
+        sub.textSize = 13f
+        sub.setTextColor(0xFFAAAAAA.toInt())
+        box.addView(sub)
 
         val b1 = Button(this)
         b1.text = "1. কিবোর্ড চালু করো"
@@ -122,8 +245,8 @@ class MainActivity : Activity() {
         }
         box.addView(b2)
 
-        title("থিম")
-        choice(Themes.list.map { it.name }, "theme", 0)
+        title("থিম বেছে নাও")
+        themeCards()
 
         title("কিবোর্ডের উচ্চতা")
 
@@ -210,8 +333,12 @@ class MainActivity : Activity() {
 
     override fun onPause() {
         super.onPause()
-        sp.edit()
-            .putString("shortcuts", scEdit.text.toString())
-            .apply()
+        if (::scEdit.isInitialized) {
+            sp.edit()
+                .putString("shortcuts", scEdit.text.toString())
+                .apply()
+        }
     }
 }
+
+
