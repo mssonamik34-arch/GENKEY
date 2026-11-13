@@ -70,6 +70,15 @@ fun GenKeyService.topBar(): LinearLayout {
     return r
 }
 
+fun GenKeyService.cycleLanguage() {
+    flush()
+    val enabled = enabledLangs()
+    lang = enabled[(enabled.indexOf(lang) + 1) % enabled.size]
+    bnPage = 0
+    layer = 0
+    render()
+}
+
 fun GenKeyService.langName(): String = when (lang) {
     0 -> "EN"
     1 -> "বাংলা"
@@ -89,12 +98,7 @@ fun GenKeyService.strip(): LinearLayout {
     val g = label("🌐", 20f, textOnBg, 0.9f)
     g.setOnClickListener {
         feedback(it)
-        flush()
-        val e = enabledLangs()
-        lang = e[(e.indexOf(lang) + 1) % e.size]
-        bnPage = 0
-        layer = 0
-        render()
+        cycleLanguage()
     }
     g.setOnLongClickListener {
         (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).showInputMethodPicker()
@@ -197,7 +201,7 @@ fun GenKeyService.bottomRow(first: String, goTo: Int): LinearLayout {
         layer = 2
         render()
     })
-    r.addView(key("🎤", YELLOW, 1f) { voice() })
+    r.addView(key("🌐", YELLOW, 1f) { cycleLanguage() })
     r.addView(key(",", WHITE, 0.8f) { commit(",") })
     r.addView(spaceKey(3f))
     r.addView(key(".", DARK, 0.8f) { commit(".") })

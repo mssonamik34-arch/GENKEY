@@ -38,7 +38,7 @@ fun GenKeyService.toolbarRow(): View {
     }
 
     val label = TextView(this)
-    label.text = "GENKEY"
+    label.text = if (VoiceHolder.state == VoiceState.LISTENING) "GENKEY • শুনছি..." else "GENKEY"
     label.textSize = 14f
     label.typeface = Typeface.DEFAULT_BOLD
     label.setTextColor(WHITE)
@@ -53,7 +53,7 @@ fun GenKeyService.toolbarRow(): View {
 
     if (toolbarExpanded) {
         val items = listOf(
-            Pair("🎤 ভয়েস", 9),
+            Pair(if (VoiceHolder.state == VoiceState.LISTENING) "⏹ বন্ধ" else "🎤 ভয়েস", 9),
             Pair("📋 পেস্ট", 6),
             Pair("⧉ কপি", 4),
             Pair("✂ কাট", 5),
@@ -96,7 +96,7 @@ fun GenKeyService.toolbarRow(): View {
                     feedback(v)
 
                     if (item.second == 9) {
-                        voice()
+                        if (VoiceHolder.state == VoiceState.LISTENING) stopVoice() else voice()
                     } else {
                         toolbar(item.second)
                     }

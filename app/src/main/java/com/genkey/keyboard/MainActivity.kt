@@ -145,7 +145,9 @@ class MainActivity : Activity() {
         previewKey(third, "↵", theme.keys[4], 1f, theme)
 
         return preview
-    }    private fun themeCards() {
+    }
+
+    private fun themeCards() {
         val selected = sp.getInt("theme", 0)
 
         Themes.list.forEachIndexed { index, theme ->
@@ -281,7 +283,8 @@ class MainActivity : Activity() {
             listOf("বন্ধ", "বাঁ দিকে", "ডান দিকে"),
             "onehand",
             0
-        )        title("ভাষা (কোনগুলো থাকবে)")
+        )
+        title("ভাষা (কোনগুলো থাকবে)")
         switchRow("English", "lang_en", true)
         switchRow("বাংলা", "lang_bn", true)
         switchRow("Avro (Banglish)", "lang_avro", true)
@@ -289,6 +292,11 @@ class MainActivity : Activity() {
         title("টাইপিং")
 
         title("Typing Speed")
+        val speedHint = TextView(this)
+        speedHint.text = "Backspace চেপে ধরে রাখলে Slow / Fast গতি বদলাবে"
+        speedHint.textSize = 12f
+        speedHint.setTextColor(0xFFAAAAAA.toInt())
+        box.addView(speedHint)
         choice(
             listOf("🐢 Slow", "⚡ Fast"),
             "typing_speed",
