@@ -2,12 +2,17 @@ package com.genkey.keyboard
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
+import android.view.MotionEvent
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
@@ -21,6 +26,10 @@ class ThemeGalleryActivity : Activity() {
     private val wrap = ViewGroup.LayoutParams.WRAP_CONTENT
     private val match = ViewGroup.LayoutParams.MATCH_PARENT
     private val colorInputs = mutableListOf<EditText>()
+    private var pickedHue = 210f
+    private var pickedColor = Color.HSVToColor(floatArrayOf(210f, 0.82f, 0.92f))
+    private var colorPreview: View? = null
+    private var colorValue: TextView? = null
 
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
 
@@ -98,6 +107,107 @@ class ThemeGalleryActivity : Activity() {
         root.addView(card, params)
     }
 
+    /** A touch-selectable HSV hue wheel; every hue around the circle is available. */
+    private inner class HueWheel : View(this@ThemeGalleryActivity) {
+        private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        private var wheel: Bitmap? = null
+        private var wheelSize = 0
+
+        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+            val desired = dp(250)
+            val width = resolveSize(desired, widthMeasureSpec)
+            setMeasuredDimension(width, resolveSize(desired, heightMeasureSpec))
+        }
+
+        private fun makeWheel(size: Int) {
+            val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+            val pixels = IntArray(size * size)
+            val cx = (size - 1) / 2f
+            val cy = (size - 1) / 2f
+            val radius = size * 0.47f
+            for (y in 0 until size) {
+                for (x in 0 until size) {
+                    val dx = x - cx
+                    val dy = y - cy
+                    val distance = kotlin.math.sqrt(dx * dx + dy * dy)
+                    if (distance <= radius) {
+                        val hue = ((Math.toDegrees(kotlin.math.atan2(dy.toDouble(), dx.toDouble())) + 360.0) % 360.0).toFloat()
+                        val saturation = (distance / radius).coerceIn(0f, 1f)
+                        pixels[y * size + x] = Color.HSVToColor(floatArrayOf(hue, saturation, 1f))
+                    } else {
+                        pixels[y * size + x] = Color.TRANSPARENT
+                    }
+                }
+            }
+            bitmap.setPixels(pixels, 0, size, 0, 0, size, size)
+            wheel = bitmap
+            wheelSize = size
+        }
+
+        override fun onDraw(canvas: Canvas) {
+            super.onDraw(canvas)
+            val size = minOf(width, height)
+            if (size <= 0) return
+            if (wheel == null || wheelSize != size) makeWheel(size)
+            val left = (width - size) / 2f
+            val top = (height - size) / 2f
+            wheel?.let { canvas.drawBitmap(it, left, top, paint) }
+            val cx = width / 2f
+            val cy = height / 2f
+            val radius = size * 0.47f
+            val angle = Math.toRadians(pickedHue.toDouble())
+            val markerRadius = radius * 0.78f
+            val mx = cx + kotlin.math.cos(angle).toFloat() * markerRadius
+            val my = cy + kotlin.math.sin(angle).toFloat() * markerRadius
+            paint.style = Paint.Style.FILL
+            paint.color = pickedColor
+            canvas.drawCircle(mx, my, dp(9).toFloat(), paint)
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = dp(3).toFloat()
+            paint.color = Color.WHITE
+            canvas.drawCircle(mx, my, dp(9).toFloat(), paint)
+            paint.style = Paint.Style.FILL
+            canvas.drawCircle(cx, cy, dp(25).toFloat(), paint)
+            paint.color = pickedColor
+            canvas.drawCircle(cx, cy, dp(21).toFloat(), paint)
+        }
+
+        override fun onTouchEvent(event: MotionEvent): Boolean {
+            if (event.action == MotionEvent.ACTION_DOWN || event.action == MotionEvent.ACTION_MOVE || event.action == MotionEvent.ACTION_UP) {
+                val dx = event.x - width / 2f
+                val dy = event.y - height / 2f
+                pickedHue = ((Math.toDegrees(kotlin.math.atan2(dy.toDouble(), dx.toDouble())) + 360.0) % 360.0).toFloat()
+                pickedColor = Color.HSVToColor(floatArrayOf(pickedHue, 0.82f, 0.95f))
+                colorPreview?.background = GradientDrawable().apply { setColor(pickedColor); cornerRadius = dp(10).toFloat() }
+                colorValue?.text = String.format("#%06X", 0xFFFFFF and pickedColor)
+                invalidate()
+                return true
+            }
+            return true
+        }
+    }
+
+    private fun applyHueTheme() {
+        fun shade(saturation: Float, value: Float): Int =
+            Color.HSVToColor(floatArrayOf(pickedHue, saturation, value))
+        val bg = shade(0.52f, 0.12f)
+        val keys = listOf(
+            shade(0.82f, 0.96f),
+            shade(0.72f, 0.78f),
+            shade(0.58f, 0.48f),
+            shade(0.30f, 0.92f),
+            shade(0.92f, 0.34f)
+        )
+        val edit = prefs.edit()
+            .putBoolean("custom_theme", true)
+            .putInt("custom_bg", bg)
+            .putFloat("custom_hue", pickedHue)
+        keys.forEachIndexed { i, color -> edit.putInt("custom_key${i + 1}", color) }
+        edit.apply()
+        android.widget.Toast.makeText(this, "তোমার পছন্দের রঙের থিম চালু হয়েছে!", android.widget.Toast.LENGTH_SHORT).show()
+        recreate()
+    }
+
     private fun colorField(label: String, value: Int) {
         val t = TextView(this)
         t.text = label
@@ -116,6 +226,33 @@ class ThemeGalleryActivity : Activity() {
 
     private fun customColors() {
         colorInputs.clear()
+        val savedHue = prefs.getFloat("custom_hue", 210f)
+        pickedHue = savedHue
+        pickedColor = Color.HSVToColor(floatArrayOf(pickedHue, 0.82f, 0.95f))
+        val wheel = HueWheel()
+        val wheelParams = LinearLayout.LayoutParams(match, dp(250))
+        wheelParams.gravity = Gravity.CENTER_HORIZONTAL
+        root.addView(wheel, wheelParams)
+
+        val selected = TextView(this)
+        selected.text = "রং বেছে নাও — পুরো বৃত্তে আঙুল ঘোরাও"
+        selected.textSize = 14f
+        selected.setTextColor(Color.WHITE)
+        selected.gravity = Gravity.CENTER
+        root.addView(selected)
+        colorValue = TextView(this)
+        colorValue?.text = String.format("#%06X", 0xFFFFFF and pickedColor)
+        colorValue?.setTextColor(Color.WHITE)
+        colorValue?.gravity = Gravity.CENTER
+        root.addView(colorValue)
+        colorPreview = View(this)
+        colorPreview?.background = GradientDrawable().apply { setColor(pickedColor); cornerRadius = dp(10).toFloat() }
+        val previewParams = LinearLayout.LayoutParams(match, dp(24))
+        previewParams.setMargins(dp(30), dp(6), dp(30), dp(8))
+        root.addView(colorPreview, previewParams)
+        button("এই রং দিয়ে পুরো কিবোর্ড সাজাও") { applyHueTheme() }
+
+        heading("Advanced: HEX color codes")
         val base = Themes.get(prefs.getInt("theme", 0))
         colorField("Background color", prefs.getInt("custom_bg", base.bg))
         val labels = listOf("Key color 1", "Key color 2", "Key color 3", "Key color 4", "Key color 5")
@@ -123,7 +260,7 @@ class ThemeGalleryActivity : Activity() {
         labels.forEachIndexed { i, label ->
             colorField(label, prefs.getInt(keys[i], base.keys[i]))
         }
-        button("Apply my colors") {
+        button("Apply HEX colors") {
             try {
                 val bg = Color.parseColor(colorInputs[0].text.toString().trim())
                 val colors = colorInputs.drop(1).map { Color.parseColor(it.text.toString().trim()) }
@@ -131,6 +268,7 @@ class ThemeGalleryActivity : Activity() {
                 keys.forEachIndexed { i, key -> edit.putInt(key, colors[i]) }
                 edit.apply()
                 android.widget.Toast.makeText(this, "Custom theme applied!", android.widget.Toast.LENGTH_SHORT).show()
+                recreate()
             } catch (_: Exception) {
                 android.widget.Toast.makeText(this, "রং লিখো #RRGGBB ফরম্যাটে", android.widget.Toast.LENGTH_LONG).show()
             }
@@ -187,7 +325,7 @@ class ThemeGalleryActivity : Activity() {
         button("🖼 Choose wallpaper") { chooseWallpaper() }
         button("Remove wallpaper") { prefs.edit().remove("wallpaper_uri").apply() }
         button("Reset custom colors") {
-            prefs.edit().putBoolean("custom_theme", false).apply()
+            prefs.edit().putBoolean("custom_theme", false).remove("custom_hue").apply()
             recreate()
         }
         setContentView(scroll)
