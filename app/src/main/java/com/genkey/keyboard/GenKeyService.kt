@@ -109,6 +109,16 @@ class GenKeyService : InputMethodService() {
     }
 
     private fun watchClipboard() {
+        val saved = try {
+            org.json.JSONArray(sp.getString("clipboard_history", "[]") ?: "[]")
+        } catch (_: Exception) {
+            org.json.JSONArray()
+        }
+        for (i in 0 until saved.length()) {
+            val item = saved.optString(i)
+            if (item.isNotBlank() && item !in clips) clips.add(item)
+        }
+
         val cm = getSystemService(CLIPBOARD_SERVICE)
                 as ClipboardManager
 
@@ -126,6 +136,9 @@ class GenKeyService : InputMethodService() {
                     while (clips.size > 20) {
                         clips.removeAt(clips.size - 1)
                     }
+                    val history = org.json.JSONArray()
+                    clips.forEach { history.put(it) }
+                    sp.edit().putString("clipboard_history", history.toString()).apply()
                 }
             } catch (e: Exception) {
             }
