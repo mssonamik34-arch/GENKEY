@@ -72,7 +72,9 @@ fun GenKeyService.backspace() {
             ic?.setComposingText("", 1)
             ic?.finishComposingText()
         } else {
-            ic?.setComposingText(Avro.convert(buf.toString()), 1)
+        ic?.setComposingText(
+    AvroDict.exact(buf.toString()) ?: Avro.convert(buf.toString()), 1
+)
         }
         updateSuggestions()
     } else {
