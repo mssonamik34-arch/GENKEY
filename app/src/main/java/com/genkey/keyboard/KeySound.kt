@@ -10,8 +10,7 @@ object KeySound {
         "standard" to R.raw.keypress_standard,
         "spacebar" to R.raw.keypress_spacebar,
         "delete" to R.raw.keypress_delete,
-        "return" to R.raw.keypress_return,
-        "faah" to R.raw.faah
+        "return" to R.raw.keypress_return
     )
 
     private var pool: SoundPool? = null
