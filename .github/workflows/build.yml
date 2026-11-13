@@ -1,9 +1,13 @@
+
 name: Build APK
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -23,7 +27,15 @@ jobs:
       - name: Build debug APK
         run: gradle assembleDebug
 
-      - uses: actions/upload-artifact@v4
+      - name: Publish direct APK download
+        uses: ncipollo/release-action@v1
         with:
-          name: GENKEY-apk
-          path: app/build/outputs/apk/debug/*.apk
+          tag: latest
+          name: GENKEY Latest APK
+          artifacts: app/build/outputs/apk/debug/*.apk
+          allowUpdates: true
+          replacesArtifacts: true
+          makeLatest: true
+          body: |
+            Latest GENKEY Android APK.
+            Download and install on your Android phone.
