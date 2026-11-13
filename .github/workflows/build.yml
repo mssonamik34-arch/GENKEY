@@ -24,6 +24,15 @@ jobs:
         with:
           gradle-version: 8.7
 
+      # Keep the Android debug signing key across CI runs so APK updates
+      # are signed by the same certificate. The key stays in Actions cache,
+      # never in the repository.
+      - name: Restore persistent Android signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: genkey-android-debug-signing-v1
+
       - name: Build debug APK
         run: gradle assembleDebug
 
