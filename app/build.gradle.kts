@@ -3,6 +3,8 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+val genkeyBuildNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
+
 android {
     namespace = "com.genkey.keyboard"
     compileSdk = 34
@@ -11,8 +13,8 @@ android {
         applicationId = "com.genkey.keyboard"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = genkeyBuildNumber
+        versionName = "1.0.$genkeyBuildNumber"
     }
 
     compileOptions {
