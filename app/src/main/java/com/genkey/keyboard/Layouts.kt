@@ -130,6 +130,7 @@ fun GenKeyService.buildClipboard() {
     })
     b.addView(key("🗑", DARK, 1.5f) {
         clips.clear()
+        sp.edit().putString("clipboard_history", "[]").apply()
         render()
     })
     b.addView(spaceKey(4f))
