@@ -246,8 +246,17 @@ class MainActivity : Activity() {
         }
         box.addView(b2)
 
-        title("থিম বেছে নাও")
-        themeCards()
+        title("থিম ও ওয়ালপেপার")
+        val themesButton = Button(this)
+        themesButton.text = "🎨 Theme Gallery খুলুন"
+        themesButton.setOnClickListener { startActivity(Intent(this, ThemeGalleryActivity::class.java)) }
+        box.addView(themesButton)
+
+        title("আপডেট")
+        val updateButton = Button(this)
+        updateButton.text = "⬆ New Update Available? চেক করো"
+        updateButton.setOnClickListener { UpdateChecker.check(this, true) }
+        box.addView(updateButton)
 
         title("কিবোর্ডের উচ্চতা")
 
@@ -310,13 +319,6 @@ class MainActivity : Activity() {
 
         title("সাউন্ড ও ভাইব্রেশন")
         switchRow("কী সাউন্ড", "sound", true)
-
-        title("কী সাউন্ড বেছে নাও")
-        choice(
-            listOf("Keyboard", "Faah"),
-            "sound_type",
-            0
-        )
 
         switchRow("ভাইব্রেশন", "vib", true)
 
