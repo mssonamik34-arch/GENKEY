@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AlertDialog
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -78,7 +77,7 @@ object UpdateChecker {
     }
 
     private fun showUpdateDialog(activity: Activity, version: String, url: String) {
-        androidx.appcompat.app.AlertDialog.Builder(activity)
+        android.app.AlertDialog.Builder(activity)
             .setTitle("নতুন GENKEY আপডেট")
             .setMessage("নতুন সংস্করণ $version পাওয়া গেছে। APK ডাউনলোড করে ইনস্টল করো।")
             .setNegativeButton("পরে") { dialog, _ -> dialog.dismiss() }
