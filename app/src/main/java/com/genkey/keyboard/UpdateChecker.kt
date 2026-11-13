@@ -22,7 +22,7 @@ object UpdateChecker {
     private const val PREFS = "genkey"
     private const val KEY_NOTICE = "last_update_notice"
 
-    fun check(activity: Activity) {
+    fun check(activity: Activity, force: Boolean = false) {
         Thread {
             var connection: HttpURLConnection? = null
             try {
@@ -49,7 +49,12 @@ object UpdateChecker {
                 }
                 if (downloadUrl.isNullOrBlank()) return@Thread
                 val installed = activity.packageManager.getPackageInfo(activity.packageName, 0).versionName ?: "1.0"
-                if (compareVersions(version, installed) <= 0) return@Thread
+                if (compareVersions(version, installed) <= 0) {
+                    if (force) activity.runOnUiThread {
+                        android.widget.Toast.makeText(activity, "তুমি সর্বশেষ GENKEY ভার্সন ব্যবহার করছো", android.widget.Toast.LENGTH_LONG).show()
+                    }
+                    return@Thread
+                }
                 val prefs = activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
                 if (prefs.getString(KEY_NOTICE, "") == version) return@Thread
                 prefs.edit().putString(KEY_NOTICE, version).apply()
