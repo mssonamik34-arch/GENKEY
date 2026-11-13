@@ -159,7 +159,27 @@ fun GenKeyService.backspaceKey(): FrameLayout {
     return b
 }
 
-fun GenKeyService.spaceKey(weight: Float): FrameLayout = key("GENKEY", DARK, weight, size = 12f) { space() }
+fun GenKeyService.spaceKey(weight: Float): FrameLayout {
+    val bar = key(langName(), DARK, weight, size = 12f) { space() }
+    var startX = 0f
+    bar.setOnTouchListener { _, event ->
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                startX = event.x
+                false
+            }
+            MotionEvent.ACTION_UP -> {
+                val distance = event.x - startX
+                if (kotlin.math.abs(distance) > dp(35)) {
+                    cycleLanguage()
+                    true
+                } else false
+            }
+            else -> false
+        }
+    }
+    return bar
+}
 
 fun GenKeyService.bottomRow(first: String, goTo: Int): LinearLayout {
     val r = row()
@@ -167,7 +187,7 @@ fun GenKeyService.bottomRow(first: String, goTo: Int): LinearLayout {
     r.addView(key("😊", BLUE, 1f) { layer = 2; render() })
     r.addView(key("🌐", YELLOW, 1f) { cycleLanguage() })
     r.addView(key(",", WHITE, 0.8f) { commit(",") })
-    r.addView(spaceKey(3f))
+    r.addView(spaceKey(3.5f))
     r.addView(key(".", DARK, 0.8f) { commit(".") })
     r.addView(key("⏎", RED, 1.3f) { enter() })
     return r
