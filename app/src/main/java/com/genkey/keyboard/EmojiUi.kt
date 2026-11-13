@@ -7,18 +7,18 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 
-private var emojiTab = 1
+private var emojiTab = 0
 private val emojiCache = HashMap<Int, List<String>>()
 
 private val emojiTabs: List<Pair<String, List<IntRange>>> = listOf(
     Pair("🕘", emptyList<IntRange>()),
     Pair("😀", listOf(0x1F600..0x1F64F, 0x1F910..0x1F92F)),
-    Pair("👍", listOf(0x1F440..0x1F4AF)),
+    Pair("👍", listOf(0x1F440..0x1F4AF, 0x1F900..0x1F9FF)),
     Pair("🐶", listOf(0x1F400..0x1F43F, 0x1F980..0x1F9AE)),
     Pair("🍔", listOf(0x1F32D..0x1F37F, 0x1F950..0x1F96F)),
     Pair("⚽", listOf(0x1F380..0x1F3D3, 0x1F3F8..0x1F3F9)),
     Pair("🚗", listOf(0x1F680..0x1F6C5, 0x1F3D4..0x1F3F0)),
-    Pair("💡", listOf(0x1F4B0..0x1F4FF, 0x1F500..0x1F53D)),
+    Pair("💡", listOf(0x1F4B0..0x1F5FF, 0x1F500..0x1F53D, 0x1F3F4..0x1F3F4)),
     Pair("❤", listOf(0x2600..0x27BF, 0x1F300..0x1F32C)),
     Pair("🏳", emptyList<IntRange>())
 )
@@ -111,6 +111,12 @@ fun GenKeyService.buildEmoji() {
     root.addView(sv)
 
     val b = row()
+    if (emojiTab == 0) {
+        b.addView(key("🗑", DARK, 1f) {
+            sp.edit().putString("recent", "").apply()
+            render()
+        })
+    }
     b.addView(key("ABC", RED, 1.5f, size = 14f) {
         layer = 0
         render()
