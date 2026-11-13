@@ -160,8 +160,13 @@ class GenKeyService : InputMethodService() {
     private fun loadPrefs() {
         val t = Themes.get(sp.getInt("theme", 0))
 
-        palette = t.keys
-        bgColor = t.bg
+        val custom = sp.getBoolean("custom_theme", false)
+        palette = if (custom) listOf(
+            sp.getInt("custom_key1", t.keys[0]), sp.getInt("custom_key2", t.keys[1]),
+            sp.getInt("custom_key3", t.keys[2]), sp.getInt("custom_key4", t.keys[3]),
+            sp.getInt("custom_key5", t.keys[4])
+        ) else t.keys
+        bgColor = if (custom) sp.getInt("custom_bg", t.bg) else t.bg
         scale = sp.getInt("height", 100) / 100f
         numRow = sp.getBoolean("numrow", false)
         oneHand = sp.getInt("onehand", 0)
@@ -251,6 +256,14 @@ class GenKeyService : InputMethodService() {
 
         root.removeAllViews()
         root.setBackgroundColor(bgColor)
+        val wallpaper = sp.getString("wallpaper_uri", null)
+        if (!wallpaper.isNullOrBlank()) {
+            try {
+                val uri = android.net.Uri.parse(wallpaper)
+                val drawable = contentResolver.openInputStream(uri)?.use { android.graphics.drawable.Drawable.createFromStream(it, null) }
+                if (drawable != null) root.background = drawable
+            } catch (_: Exception) { sp.edit().remove("wallpaper_uri").apply() }
+        }
 
         val side = (
             resources.displayMetrics.widthPixels * 0.22f
