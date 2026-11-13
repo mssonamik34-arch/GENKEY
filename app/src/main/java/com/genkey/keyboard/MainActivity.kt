@@ -90,6 +90,7 @@ class MainActivity : Activity() {
 
         paint()
     }
+
     private fun previewKey(
         parent: LinearLayout,
         text: String,
@@ -204,6 +205,7 @@ class MainActivity : Activity() {
             box.addView(card, params)
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -290,6 +292,14 @@ class MainActivity : Activity() {
         switchRow("Avro (Banglish)", "lang_avro", true)
 
         title("টাইপিং")
+
+        title("Typing Speed")
+        choice(
+            listOf("🐢 Slow", "⚡ Fast"),
+            "typing_speed",
+            1
+        )
+
         switchRow("শব্দ সাজেশন", "suggest", true)
         switchRow("অটো-কারেক্ট (শুধু English)", "autocorrect", false)
         switchRow("উপরে নম্বর রো", "numrow", false)
@@ -340,5 +350,3 @@ class MainActivity : Activity() {
         }
     }
 }
-
-
