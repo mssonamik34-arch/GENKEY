@@ -38,4 +38,5 @@ jobs:
           makeLatest: true
           body: |
             Latest GENKEY Android APK.
+            Version: 1.0.${{ github.run_number }}
             Download and install on your Android phone.
