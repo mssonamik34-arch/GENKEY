@@ -3,7 +3,6 @@ package com.genkey.keyboard
 
 import android.content.Intent
 import android.graphics.drawable.GradientDrawable
-import android.media.MediaPlayer
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
@@ -203,7 +202,7 @@ fun GenKeyService.voice() {
     startActivity(i)
 }
 
-fun GenKeyService.feedback(v: View) {
+fun GenKeyService.feedback(v: View, soundType: String = "standard") {
     if (sp.getBoolean("vib", true)) {
         v.performHapticFeedback(
             HapticFeedbackConstants.KEYBOARD_TAP,
@@ -211,19 +210,7 @@ fun GenKeyService.feedback(v: View) {
         )
     }
 
-    if (sp.getBoolean("sound", true)) {
-        val soundRes = when (sp.getInt("sound_type", 0)) {
-            1 -> R.raw.faah
-            else -> R.raw.keyboardsound
-        }
-
-        MediaPlayer.create(this, soundRes)?.apply {
-            setOnCompletionListener { player ->
-                player.release()
-            }
-            start()
-        }
-    }
+    KeySound.play(this, soundType)
 }
 
 fun GenKeyService.showPreview(v: View, s: String) {
