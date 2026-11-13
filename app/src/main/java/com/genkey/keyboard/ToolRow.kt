@@ -64,7 +64,7 @@ fun GenKeyService.toolbarRow(): View {
             Triple("⇄", 8) { toolbar(8) },
             Triple("⚙", 0) { toolbar(0) }
         )
-        for ((symbol, action) in actions) {
+        for ((symbol, _, action) in actions) {
             val t = TextView(this)
             t.text = symbol
             t.textSize = 19f
