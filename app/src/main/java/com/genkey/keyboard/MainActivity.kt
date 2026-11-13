@@ -1,4 +1,3 @@
-
 package com.genkey.keyboard
 
 import android.app.Activity
@@ -146,9 +145,7 @@ class MainActivity : Activity() {
         previewKey(third, "↵", theme.keys[4], 1f, theme)
 
         return preview
-    }
-
-    private fun themeCards() {
+    }    private fun themeCards() {
         val selected = sp.getInt("theme", 0)
 
         Themes.list.forEachIndexed { index, theme ->
@@ -284,9 +281,7 @@ class MainActivity : Activity() {
             listOf("বন্ধ", "বাঁ দিকে", "ডান দিকে"),
             "onehand",
             0
-        )
-
-        title("ভাষা (কোনগুলো থাকবে)")
+        )        title("ভাষা (কোনগুলো থাকবে)")
         switchRow("English", "lang_en", true)
         switchRow("বাংলা", "lang_bn", true)
         switchRow("Avro (Banglish)", "lang_avro", true)
