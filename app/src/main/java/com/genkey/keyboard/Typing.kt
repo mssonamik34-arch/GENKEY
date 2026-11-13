@@ -1,9 +1,9 @@
+
 package com.genkey.keyboard
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.GradientDrawable
-import android.media.AudioManager
+import android.media.MediaPlayer
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
@@ -44,8 +44,8 @@ fun GenKeyService.typeLetter(s: String) {
         undoOrig = null
         buf.append(c)
         currentInputConnection?.setComposingText(
-    AvroDict.exact(buf.toString()) ?: Avro.convert(buf.toString()), 1
-)
+            AvroDict.exact(buf.toString()) ?: Avro.convert(buf.toString()), 1
+        )
         updateSuggestions()
     } else {
         commit(c)
@@ -72,9 +72,9 @@ fun GenKeyService.backspace() {
             ic?.setComposingText("", 1)
             ic?.finishComposingText()
         } else {
-        ic?.setComposingText(
-    AvroDict.exact(buf.toString()) ?: Avro.convert(buf.toString()), 1
-)
+            ic?.setComposingText(
+                AvroDict.exact(buf.toString()) ?: Avro.convert(buf.toString()), 1
+            )
         }
         updateSuggestions()
     } else {
@@ -210,9 +210,19 @@ fun GenKeyService.feedback(v: View) {
             HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
         )
     }
+
     if (sp.getBoolean("sound", true)) {
-        (getSystemService(Context.AUDIO_SERVICE) as AudioManager)
-            .playSoundEffect(AudioManager.FX_KEYPRESS_STANDARD)
+        val soundRes = when (sp.getInt("sound_type", 0)) {
+            1 -> R.raw.faah
+            else -> R.raw.keyboardsound
+        }
+
+        MediaPlayer.create(this, soundRes)?.apply {
+            setOnCompletionListener { player ->
+                player.release()
+            }
+            start()
+        }
     }
 }
 
