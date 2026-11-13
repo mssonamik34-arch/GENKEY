@@ -342,6 +342,7 @@ class MainActivity : Activity() {
         box.addView(clear)
 
         setContentView(scroll)
+        UpdateChecker.check(this)
     }
 
     override fun onPause() {
