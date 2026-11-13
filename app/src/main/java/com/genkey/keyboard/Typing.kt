@@ -210,7 +210,8 @@ fun GenKeyService.feedback(v: View, soundType: String = "standard") {
         )
     }
 
-    KeySound.play(this, soundType)
+    val selectedSound = if (sp.getInt("sound_type", 0) == 1) "faah" else soundType
+    KeySound.play(this, selectedSound)
 }
 
 fun GenKeyService.showPreview(v: View, s: String) {
