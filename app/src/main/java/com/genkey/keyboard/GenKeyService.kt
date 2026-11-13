@@ -57,6 +57,10 @@ class GenKeyService : InputMethodService() {
 
     internal fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
 
+    internal fun voice() {
+        startVoice()
+    }
+
     internal fun loadFont(): Typeface {
         val id = resources.getIdentifier("dotfont", "font", packageName)
         if (id != 0 && Build.VERSION.SDK_INT >= 26) {
@@ -73,6 +77,11 @@ class GenKeyService : InputMethodService() {
         sp = getSharedPreferences("genkey", MODE_PRIVATE)
         Dict.load(sp)
         watchClipboard()
+    }
+
+    override fun onDestroy() {
+        stopVoice()
+        super.onDestroy()
     }
 
     private fun watchClipboard() {
@@ -131,15 +140,11 @@ class GenKeyService : InputMethodService() {
         shift = false
         loadPrefs()
         if (::root.isInitialized) render()
-        if (VoiceActivity.pending != null) {
-            handler.postDelayed({
-                val t = VoiceActivity.pending
-                if (t != null) {
-                    currentInputConnection?.commitText("$t ", 1)
-                    VoiceActivity.pending = null
-                }
-            }, 300)
-        }
+    }
+
+    override fun onFinishInputView(finishingInput: Boolean) {
+        super.onFinishInputView(finishingInput)
+        stopVoice()
     }
 
     override fun onFinishInput() {
@@ -168,7 +173,7 @@ class GenKeyService : InputMethodService() {
             buildEmoji()
             return
         }
-        root.addView(topBar())
+        root.addView(toolbarRow())
         root.addView(strip())
         when (layer) {
             0 -> if (lang == 1) buildBangla() else buildLetters()
