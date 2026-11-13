@@ -43,7 +43,9 @@ fun GenKeyService.typeLetter(s: String) {
     if (lang == 2) {
         undoOrig = null
         buf.append(c)
-        currentInputConnection?.setComposingText(Avro.convert(buf.toString()), 1)
+        currentInputConnection?.setComposingText(
+    AvroDict.exact(buf.toString()) ?: Avro.convert(buf.toString()), 1
+)
         updateSuggestions()
     } else {
         commit(c)
