@@ -11,6 +11,9 @@
         android:icon="@drawable/ic_launcher"
         android:label="GENKEY">
         <activity
+            android:name=".ThemeGalleryActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
