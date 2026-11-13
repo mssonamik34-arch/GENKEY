@@ -39,7 +39,8 @@ fun GenKeyService.toolbarRow(): View {
     brand.gravity = Gravity.CENTER_VERTICAL
     val title = TextView(this)
     title.text = if (VoiceHolder.state == VoiceState.LISTENING) "GENKEY  •  শুনছি..." else "GENKEY"
-    title.textSize = 15f
+    title.textSize = 12f
+    title.letterSpacing = 0.06f
     title.typeface = Typeface.DEFAULT_BOLD
     title.setTextColor(0xFFF4F3FF.toInt())
     brand.addView(title)
