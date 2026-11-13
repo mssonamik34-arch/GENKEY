@@ -1,6 +1,5 @@
 package com.genkey.keyboard
 
-import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
 import android.view.View
@@ -12,86 +11,75 @@ fun GenKeyService.toolbarRow(): View {
     outer.orientation = LinearLayout.VERTICAL
     outer.setPadding(dp(2), dp(2), dp(2), dp(2))
 
-    val top = LinearLayout(this)
-    top.orientation = LinearLayout.HORIZONTAL
-    top.gravity = Gravity.CENTER_VERTICAL
-    val topBg = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
-        intArrayOf(0xFF17172D.toInt(), 0xFF10263B.toInt()))
-    topBg.cornerRadius = dp(13).toFloat()
-    top.background = topBg
+    val main = LinearLayout(this)
+    main.orientation = LinearLayout.HORIZONTAL
+    main.gravity = Gravity.CENTER_VERTICAL
 
-    val menu = TextView(this)
-    menu.text = if (toolbarExpanded) "✕" else "☰"
-    menu.textSize = 20f
-    menu.gravity = Gravity.CENTER
-    menu.setTextColor(0xFFE7E8FF.toInt())
-    val menuBg = GradientDrawable()
-    menuBg.setColor(0xFF29294A.toInt())
-    menuBg.cornerRadius = dp(10).toFloat()
-    menu.background = menuBg
-    val menuParams = LinearLayout.LayoutParams(dp(42), dp(36))
-    menuParams.setMargins(dp(4), dp(3), dp(8), dp(3))
-    top.addView(menu, menuParams)
-    menu.setOnClickListener { toolbarExpanded = !toolbarExpanded; render() }
+    fun icon(symbol: String, width: Int = 36, action: () -> Unit): TextView {
+        val t = TextView(this)
+        t.text = symbol
+        t.textSize = 19f
+        t.gravity = Gravity.CENTER
+        t.setTextColor(textOnBg)
+        val shape = GradientDrawable()
+        shape.setColor(0x332A86FF)
+        shape.cornerRadius = dp(10).toFloat()
+        t.background = shape
+        val lp = LinearLayout.LayoutParams(dp(width), dp(40))
+        lp.setMargins(dp(1), dp(1), dp(1), dp(1))
+        main.addView(t, lp)
+        t.setOnClickListener { feedback(t); action() }
+        return t
+    }
 
-    val brand = LinearLayout(this)
-    brand.orientation = LinearLayout.VERTICAL
-    brand.gravity = Gravity.CENTER_VERTICAL
-    val title = TextView(this)
-    title.text = if (VoiceHolder.state == VoiceState.LISTENING) "GENKEY  •  শুনছি..." else "GENKEY"
-    title.textSize = 15f
-    title.typeface = Typeface.DEFAULT_BOLD
-    title.setTextColor(0xFFF4F3FF.toInt())
-    brand.addView(title)
-    val sub = TextView(this)
-    sub.text = "PREMIUM KEYBOARD"
-    sub.textSize = 8f
-    sub.typeface = Typeface.DEFAULT_BOLD
-    sub.letterSpacing = 0.16f
-    sub.setTextColor(0xFF9C9BEA.toInt())
-    brand.addView(sub)
-    top.addView(brand, LinearLayout.LayoutParams(0, dp(40), 1f))
+    icon(if (toolbarExpanded) "‹" else "☰", 36) {
+        toolbarExpanded = !toolbarExpanded
+        render()
+    }
 
-    val live = TextView(this)
-    live.text = "✦"
-    live.textSize = 19f
-    live.gravity = Gravity.CENTER
-    live.setTextColor(0xFF79D8FF.toInt())
-    top.addView(live, LinearLayout.LayoutParams(dp(36), dp(40)))
-    outer.addView(top)
+    for (i in 0..2) {
+        val suggestion = TextView(this)
+        suggestion.textSize = 15f
+        suggestion.gravity = Gravity.CENTER
+        suggestion.maxLines = 1
+        suggestion.setTextColor(textOnBg)
+        suggestion.setPadding(dp(2), 0, dp(2), 0)
+        suggestion.setOnClickListener { pickSuggestion(suggestion.text.toString()) }
+        sug[i] = suggestion
+        main.addView(suggestion, LinearLayout.LayoutParams(0, dp(40), 1f))
+    }
+
+    icon("🎙", 38) {
+        if (VoiceHolder.state == VoiceState.LISTENING) stopVoice() else voice()
+    }
+    outer.addView(main)
 
     if (toolbarExpanded) {
-        val items = listOf(
-            Pair(if (VoiceHolder.state == VoiceState.LISTENING) "⏹ বন্ধ" else "🎤 ভয়েস", 9),
-            Pair("📋 পেস্ট", 6), Pair("⧉ কপি", 4), Pair("✂ কাট", 5), Pair("▦ সব", 3),
-            Pair("🕘 ক্লিপ", 7), Pair("↶ আন্ডু", 1), Pair("↷ রিডু", 2), Pair("⇄ এক হাত", 8), Pair("⚙ সেটিংস", 0)
+        val tools = LinearLayout(this)
+        tools.orientation = LinearLayout.HORIZONTAL
+        tools.gravity = Gravity.CENTER
+        val actions = listOf(
+            Triple("😊", 30) { layer = 2; render() },
+            Triple("📋", 7) { toolbar(7) },
+            Triple("⇄", 8) { toolbar(8) },
+            Triple("⚙", 0) { toolbar(0) }
         )
-        for (group in items.chunked(5)) {
-            val row = LinearLayout(this)
-            row.orientation = LinearLayout.HORIZONTAL
-            for (item in group) {
-                val t = TextView(this)
-                t.text = item.first
-                t.textSize = 11f
-                t.gravity = Gravity.CENTER
-                t.setTextColor(0xFFE9E9FF.toInt())
-                val shape = GradientDrawable()
-                shape.setColor(0xFF20213A.toInt())
-                shape.cornerRadius = dp(9).toFloat()
-                shape.setStroke(dp(1), 0x503F8CFF)
-                t.background = shape
-                val lp = LinearLayout.LayoutParams(0, dp(38), 1f)
-                lp.setMargins(dp(2), dp(3), dp(2), dp(3))
-                row.addView(t, lp)
-                t.setOnClickListener { v ->
-                    feedback(v)
-                    if (item.second == 9) {
-                        if (VoiceHolder.state == VoiceState.LISTENING) stopVoice() else voice()
-                    } else toolbar(item.second)
-                }
-            }
-            outer.addView(row)
+        for ((symbol, _, action) in actions) {
+            val t = TextView(this)
+            t.text = symbol
+            t.textSize = 19f
+            t.gravity = Gravity.CENTER
+            t.setTextColor(textOnBg)
+            val shape = GradientDrawable()
+            shape.setColor(0x332A86FF)
+            shape.cornerRadius = dp(10).toFloat()
+            t.background = shape
+            val lp = LinearLayout.LayoutParams(0, dp(36), 1f)
+            lp.setMargins(dp(3), dp(2), dp(3), dp(2))
+            tools.addView(t, lp)
+            t.setOnClickListener { feedback(t); action() }
         }
+        outer.addView(tools)
     }
     return outer
 }
