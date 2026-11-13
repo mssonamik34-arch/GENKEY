@@ -1,3 +1,4 @@
+
 package com.genkey.keyboard
 
 import android.content.ClipboardManager
@@ -47,6 +48,7 @@ class GenKeyService : InputMethodService() {
     internal val sug = arrayOfNulls<TextView>(3)
     internal val handler = Handler(Looper.getMainLooper())
     internal val keyFont: Typeface by lazy { loadFont() }
+
     internal val repeatTask: Runnable = object : Runnable {
         override fun run() {
             if (!repeating) return
@@ -55,7 +57,8 @@ class GenKeyService : InputMethodService() {
         }
     }
 
-    internal fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
+    internal fun dp(v: Int): Int =
+        (v * resources.displayMetrics.density).toInt()
 
     internal fun voice() {
         startVoice()
@@ -75,12 +78,14 @@ class GenKeyService : InputMethodService() {
     override fun onCreate() {
         super.onCreate()
         sp = getSharedPreferences("genkey", MODE_PRIVATE)
+        KeySound.init(this)
         Dict.load(sp)
         watchClipboard()
     }
 
     override fun onDestroy() {
         stopVoice()
+        KeySound.release()
         super.onDestroy()
     }
 
@@ -88,11 +93,14 @@ class GenKeyService : InputMethodService() {
         val cm = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         cm.addPrimaryClipChangedListener {
             try {
-                val t = cm.primaryClip?.getItemAt(0)?.coerceToText(this)?.toString()
+                val t = cm.primaryClip?.getItemAt(0)
+                    ?.coerceToText(this)?.toString()
                 if (!t.isNullOrBlank()) {
                     clips.remove(t)
                     clips.add(0, t)
-                    while (clips.size > 20) clips.removeAt(clips.size - 1)
+                    while (clips.size > 20) {
+                        clips.removeAt(clips.size - 1)
+                    }
                 }
             } catch (e: Exception) {
             }
@@ -116,10 +124,16 @@ class GenKeyService : InputMethodService() {
         numRow = sp.getBoolean("numrow", false)
         oneHand = sp.getInt("onehand", 0)
         shortcuts.clear()
+
         for (line in (sp.getString("shortcuts", "") ?: "").split("\n")) {
             val i = line.indexOf('=')
-            if (i > 0) shortcuts[line.substring(0, i).trim().lowercase()] = line.substring(i + 1).trim()
+            if (i > 0) {
+                shortcuts[
+                    line.substring(0, i).trim().lowercase()
+                ] = line.substring(i + 1).trim()
+            }
         }
+
         val en = enabledLangs()
         if (!en.contains(lang)) lang = en[0]
     }
@@ -153,10 +167,18 @@ class GenKeyService : InputMethodService() {
     }
 
     override fun onUpdateSelection(
-        oldSelStart: Int, oldSelEnd: Int, newSelStart: Int, newSelEnd: Int,
-        candidatesStart: Int, candidatesEnd: Int
+        oldSelStart: Int,
+        oldSelEnd: Int,
+        newSelStart: Int,
+        newSelEnd: Int,
+        candidatesStart: Int,
+        candidatesEnd: Int
     ) {
-        super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd)
+        super.onUpdateSelection(
+            oldSelStart, oldSelEnd,
+            newSelStart, newSelEnd,
+            candidatesStart, candidatesEnd
+        )
         updateSuggestions()
     }
 
@@ -164,22 +186,30 @@ class GenKeyService : InputMethodService() {
         hidePreview()
         root.removeAllViews()
         root.setBackgroundColor(bgColor)
+
         val side = (resources.displayMetrics.widthPixels * 0.22f).toInt()
+
         root.setPadding(
-            dp(3) + (if (oneHand == 2) side else 0), dp(2),
-            dp(3) + (if (oneHand == 1) side else 0), dp(6)
+            dp(3) + (if (oneHand == 2) side else 0),
+            dp(2),
+            dp(3) + (if (oneHand == 1) side else 0),
+            dp(6)
         )
+
         if (layer == 2) {
             buildEmoji()
             return
         }
+
         root.addView(toolbarRow())
         root.addView(strip())
+
         when (layer) {
             0 -> if (lang == 1) buildBangla() else buildLetters()
             1 -> buildSymbols()
             else -> buildClipboard()
         }
+
         updateSuggestions()
     }
 
