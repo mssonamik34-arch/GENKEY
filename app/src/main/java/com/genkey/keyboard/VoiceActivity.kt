@@ -7,103 +7,77 @@ import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
-import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 
-object VoiceState {
-    var recognizer: SpeechRecognizer? = null
-    var listening = false
-}
+class VoiceActivity : ComponentActivity() {
 
-private fun GenKeyService.say(s: String) {
-    Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
-}
+    private var recognizer: SpeechRecognizer? = null
 
-fun GenKeyService.stopVoice() {
-    val r = VoiceState.recognizer
-    VoiceState.recognizer = null
-    VoiceState.listening = false
-    if (r != null) {
-        try {
-            r.cancel()
-            r.destroy()
-        } catch (e: Exception) {
+    private val permissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) listen() else finish()
+        }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val has = ContextCompat.checkSelfPermission(
+            this, Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
+        if (has) listen() else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+    }
+
+    private fun listen() {
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+            finish()
+            return
+        }
+        recognizer = SpeechRecognizer.createSpeechRecognizer(this).apply {
+            setRecognitionListener(object : RecognitionListener {
+                override fun onResults(results: android.os.Bundle?) {
+                    val text = results
+                        ?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                        ?.firstOrNull()
+                    if (!text.isNullOrBlank()) {
+                        sendBroadcast(
+                            Intent(ACTION_VOICE_RESULT)
+                                .setPackage(packageName)
+                                .putExtra(EXTRA_TEXT, text)
+                        )
+                    }
+                    finish()
+                }
+
+                override fun onError(error: Int) { finish() }
+                override fun onReadyForSpeech(params: android.os.Bundle?) {}
+                override fun onBeginningOfSpeech() {}
+                override fun onRmsChanged(rmsdB: Float) {}
+                override fun onBufferReceived(buffer: ByteArray?) {}
+                override fun onEndOfSpeech() {}
+                override fun onPartialResults(partialResults: android.os.Bundle?) {}
+                override fun onEvent(eventType: Int, params: android.os.Bundle?) {}
+            })
+            startListening(
+                Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                    putExtra(
+                        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                    )
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE, "bn-BD")
+                }
+            )
         }
     }
-}
 
-fun GenKeyService.startVoice() {
-    if (VoiceState.listening) {
-        try {
-            VoiceState.recognizer?.stopListening()
-        } catch (e: Exception) {
-        }
-        return
+    override fun onDestroy() {
+        recognizer?.destroy()
+        recognizer = null
+        super.onDestroy()
     }
-    if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-        val p = Intent(this, MicPermissionActivity::class.java)
-        p.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(p)
-        return
+
+    companion object {
+        const val ACTION_VOICE_RESULT = "com.genkey.keyboard.VOICE_RESULT"
+        const val EXTRA_TEXT = "text"
     }
-    if (!SpeechRecognizer.isRecognitionAvailable(this)) {
-        say("ভয়েস টাইপিং এর জন্য Google অ্যাপ লাগবে")
-        return
-    }
-    flush()
-    stopVoice()
-    val r = SpeechRecognizer.createSpeechRecognizer(this)
-    VoiceState.recognizer = r
-    r.setRecognitionListener(object : RecognitionListener {
-        override fun onReadyForSpeech(params: Bundle?) {
-            VoiceState.listening = true
-            say("শুনছি... বলো")
-        }
-
-        override fun onBeginningOfSpeech() {}
-        override fun onRmsChanged(rmsdB: Float) {}
-        override fun onBufferReceived(buffer: ByteArray?) {}
-        override fun onEndOfSpeech() {}
-
-        override fun onError(error: Int) {
-            val msg = when (error) {
-                SpeechRecognizer.ERROR_NO_MATCH, SpeechRecognizer.ERROR_SPEECH_TIMEOUT ->
-                    "কিছু শুনতে পাইনি, আবার বলো"
-                SpeechRecognizer.ERROR_NETWORK, SpeechRecognizer.ERROR_NETWORK_TIMEOUT ->
-                    "ইন্টারনেট সংযোগ দেখো"
-                SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS ->
-                    "মাইক্রোফোন অনুমতি দাও"
-                else -> "ভয়েস টাইপিং হয়নি ($error)"
-            }
-            currentInputConnection?.finishComposingText()
-            stopVoice()
-            say(msg)
-        }
-
-        override fun onResults(results: Bundle?) {
-            val list = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-            val t = if (list.isNullOrEmpty()) "" else list[0]
-            val ic = currentInputConnection
-            if (t.isNotEmpty() && ic != null) {
-                ic.commitText("$t ", 1)
-            } else {
-                ic?.finishComposingText()
-            }
-            stopVoice()
-        }
-
-        override fun onPartialResults(partialResults: Bundle?) {
-            val list = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-            if (!list.isNullOrEmpty() && list[0].isNotEmpty()) {
-                currentInputConnection?.setComposingText(list[0], 1)
-            }
-        }
-
-        override fun onEvent(eventType: Int, params: Bundle?) {}
-    })
-    val i = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-    i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-    i.putExtra(RecognizerIntent.EXTRA_LANGUAGE, if (lang == 0) "en-US" else "bn-BD")
-    i.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-    i.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, packageName)
-    r.startListening(i)
 }
