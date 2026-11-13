@@ -1,3 +1,4 @@
+
 package com.genkey.keyboard
 
 import android.content.Context
@@ -152,7 +153,12 @@ fun GenKeyService.key(
         }
     }
     f.setOnClickListener {
-        feedback(f)
+        val soundType = when (label) {
+            "GENKEY" -> "spacebar"
+            "⏎" -> "return"
+            else -> "standard"
+        }
+        feedback(f, soundType)
         onTap()
     }
     return f
@@ -163,7 +169,7 @@ fun GenKeyService.backspaceKey(): FrameLayout {
     b.setOnTouchListener { _, e ->
         when (e.action) {
             MotionEvent.ACTION_DOWN -> {
-                feedback(b)
+                feedback(b, "delete")
                 backspace()
                 repeating = true
                 handler.postDelayed(repeatTask, 400)
