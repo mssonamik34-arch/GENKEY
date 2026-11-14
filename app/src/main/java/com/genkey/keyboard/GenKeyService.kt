@@ -42,6 +42,7 @@ class GenKeyService : InputMethodService() {
     internal var oneHand = 0
     internal var scale = 1f
     internal var toolbarExpanded = false
+    internal var toolbarHidden = false
     internal var layoutMode = 0
 
     internal var undoOrig: String? = null
