@@ -1,8 +1,8 @@
+package com.genkey.keyboard
+
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
-
-package com.genkey.keyboard
 
 private val bnPage0 = listOf(
     listOf("ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ", "ঝ", "ঞ"),
