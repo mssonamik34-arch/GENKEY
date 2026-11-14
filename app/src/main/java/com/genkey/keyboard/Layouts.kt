@@ -176,7 +176,7 @@ fun GenKeyService.buildModernEnglishLayout() {
     bottom.addView(key(",", c[2], 0.8f, "!", 19f) { commit(",") })
     bottom.addView(modernSpaceKey(3.3f))
     bottom.addView(key(".", c[2], 0.8f, "…", 19f) { commit(".") })
-    bottom.addView(key(modernEnterLabel(), 0xFF00B96B.toInt(), 1.45f, size = 20f) { enter() })
+    bottom.addView(key(modernEnterLabel(), RED, 1.45f, size = 20f) { enter() })
     root.addView(bottom)
 }
 
