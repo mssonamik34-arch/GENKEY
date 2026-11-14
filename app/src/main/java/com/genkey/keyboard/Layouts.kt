@@ -171,7 +171,7 @@ fun GenKeyService.buildModernEnglishLayout() {
     root.addView(r3)
 
     val bottom = row(60)
-    bottom.addView(key("?123", 0xFF4030A0.toInt(), 1.25f, size = 15f) { layer = 1; render() })
+    bottom.addView(key("?123", BLUE, 1.25f, size = 15f) { layer = 1; render() })
     bottom.addView(key("🌐", c[1], 0.9f, size = 21f) { cycleLanguage() })
     bottom.addView(key(",", c[2], 0.8f, "!", 19f) { commit(",") })
     bottom.addView(modernSpaceKey(3.3f))
