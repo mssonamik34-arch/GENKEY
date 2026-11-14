@@ -25,7 +25,8 @@ object Themes {
         KTheme("Borussia Dortmund", 0xFF171717.toInt(), listOf(0xFFFDE100.toInt(), 0xFF1A1A1A.toInt(), 0xFFFFE94A.toInt(), 0xFFFFFFFF.toInt(), 0xFF3B3B3B.toInt())),
         KTheme("Inter Milan", 0xFF071323.toInt(), listOf(0xFF0068A8.toInt(), 0xFF000000.toInt(), 0xFF00AEEF.toInt(), 0xFFFFFFFF.toInt(), 0xFF1B3155.toInt())),
         KTheme("AC Milan", 0xFF180909.toInt(), listOf(0xFFFB090B.toInt(), 0xFF111111.toInt(), 0xFFFFFFFF.toInt(), 0xFF8B0000.toInt(), 0xFF555555.toInt())),
-        KTheme("Juventus", 0xFF101010.toInt(), listOf(0xFFFFFFFF.toInt(), 0xFF1B1B1B.toInt(), 0xFFDADADA.toInt(), 0xFF777777.toInt(), 0xFFF5F5F5.toInt()))
+        KTheme("Juventus", 0xFF101010.toInt(), listOf(0xFFFFFFFF.toInt(), 0xFF1B1B1B.toInt(), 0xFFDADADA.toInt(), 0xFF777777.toInt(), 0xFFF5F5F5.toInt())),
+        KTheme("Neon Glass", 0xFF070A18.toInt(), listOf(0xFF3546A8.toInt(), 0xFF29365F.toInt(), 0xFF151D3A.toInt(), 0xFFB9C7FF.toInt(), 0xFF00C878.toInt()))
     )
 
     fun get(i: Int): KTheme = list[if (i in list.indices) i else 0]

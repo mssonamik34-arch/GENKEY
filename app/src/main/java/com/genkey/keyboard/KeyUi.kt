@@ -101,7 +101,7 @@ fun GenKeyService.key(
     val green = ((Color.green(bg) * 1.12f).toInt()).coerceAtMost(255)
     val blue = ((Color.blue(bg) * 1.12f).toInt()).coerceAtMost(255)
     val topColor = Color.rgb(red, green, blue)
-    shape.cornerRadius = dp(11).toFloat()
+    shape.cornerRadius = dp(if (sp.getInt("layout_mode", 0) == 1) 14 else 11).toFloat()
     shape.orientation = GradientDrawable.Orientation.TOP_BOTTOM
     shape.colors = intArrayOf(topColor, bg)
     shape.setStroke(dp(1), 0x45FFFFFF)

@@ -246,6 +246,9 @@ class MainActivity : Activity() {
         }
         box.addView(b2)
 
+        title("Keyboard Layout")
+        choice(listOf("Classic Layout", "New Layout"), "layout_mode", 0)
+
         title("থিম ও ওয়ালপেপার")
         val themesButton = Button(this)
         themesButton.text = "🎨 Theme Gallery খুলুন"

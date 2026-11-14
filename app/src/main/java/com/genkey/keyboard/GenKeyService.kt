@@ -42,6 +42,7 @@ class GenKeyService : InputMethodService() {
     internal var oneHand = 0
     internal var scale = 1f
     internal var toolbarExpanded = false
+    internal var layoutMode = 0
 
     internal var undoOrig: String? = null
     internal var undoLen = 0
@@ -170,6 +171,7 @@ class GenKeyService : InputMethodService() {
         scale = sp.getInt("height", 100) / 100f
         numRow = sp.getBoolean("numrow", false)
         oneHand = sp.getInt("onehand", 0)
+        layoutMode = sp.getInt("layout_mode", 0)
 
         shortcuts.clear()
 
@@ -281,10 +283,18 @@ class GenKeyService : InputMethodService() {
             return
         }
 
-        root.addView(toolbarRow())
-        root.addView(strip())
-
-        when (layer) {
+        if (layoutMode == 1) {
+            root.addView(modernToolbarRow())
+            when (layer) {
+                0 -> if (lang == 1) buildBangla() else buildModernEnglishLayout()
+                1 -> buildSymbols()
+                else -> buildClipboard()
+            }
+            root.addView(modernHideRow())
+        } else {
+            root.addView(toolbarRow())
+            root.addView(strip())
+            when (layer) {
             0 -> if (lang == 1) {
                 buildBangla()
             } else {
@@ -292,7 +302,8 @@ class GenKeyService : InputMethodService() {
             }
 
             1 -> buildSymbols()
-            else -> buildClipboard()
+                else -> buildClipboard()
+            }
         }
 
         updateSuggestions()
