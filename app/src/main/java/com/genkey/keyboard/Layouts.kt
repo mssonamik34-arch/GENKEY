@@ -140,8 +140,7 @@ fun GenKeyService.buildClipboard() {
 
 
 fun GenKeyService.buildModernEnglishLayout() {
-    val c = listOf(0xFF252E59.toInt(), 0xFF202A50.toInt(), 0xFF1B2448.toInt(),
-        0xFF27315D.toInt(), 0xFF20294D.toInt())
+    val c = palette
     val r1 = row(58)
     "qwertyuiop".forEachIndexed { i, ch ->
         val v = ch.toString()
