@@ -158,7 +158,7 @@ fun GenKeyService.buildModernEnglishLayout() {
     root.addView(r2)
 
     val r3 = row(58)
-    r3.addView(key(if (shift) "⇪" else "⇧", 0xFF4030A0.toInt(), 1.35f, size = 23f) {
+    r3.addView(key(if (shift) "⇪" else "⇧", BLUE, 1.35f, size = 23f) {
         shift = !shift
         render()
     })
