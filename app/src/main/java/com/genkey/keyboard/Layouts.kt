@@ -137,3 +137,92 @@ fun GenKeyService.buildClipboard() {
     b.addView(backspaceKey())
     root.addView(b)
 }
+
+
+fun GenKeyService.buildModernEnglishLayout() {
+    val c = listOf(0xFF252E59.toInt(), 0xFF202A50.toInt(), 0xFF1B2448.toInt(),
+        0xFF27315D.toInt(), 0xFF20294D.toInt())
+    val r1 = row(58)
+    "qwertyuiop".forEachIndexed { i, ch ->
+        val v = ch.toString()
+        r1.addView(key(if (shift) v.uppercase() else v, c[i % c.size], 1f, "0123456789"[i].toString(), 22f) { typeLetter(v) })
+    }
+    root.addView(r1)
+
+    val r2 = row(58)
+    r2.setPadding(dp(12), 0, dp(12), 0)
+    val hints2 = listOf("@", "#", "_", "&", "-", "+", "(", ")", "")
+    "asdfghjkl".forEachIndexed { i, ch ->
+        val v = ch.toString()
+        r2.addView(key(if (shift) v.uppercase() else v, c[(i + 1) % c.size], 1f, hints2[i], 22f) { typeLetter(v) })
+    }
+    root.addView(r2)
+
+    val r3 = row(58)
+    r3.addView(key(if (shift) "⇪" else "⇧", 0xFF4030A0.toInt(), 1.35f, size = 23f) {
+        shift = !shift
+        render()
+    })
+    val hints3 = listOf("*", "\"", "'", ":", ";", "!", "?")
+    "zxcvbnm".forEachIndexed { i, ch ->
+        val v = ch.toString()
+        r3.addView(key(if (shift) v.uppercase() else v, c[(i + 2) % c.size], 1f, hints3[i], 22f) { typeLetter(v) })
+    }
+    r3.addView(backspaceKey())
+    root.addView(r3)
+
+    val bottom = row(60)
+    bottom.addView(key("?123", 0xFF4030A0.toInt(), 1.25f, size = 15f) { layer = 1; render() })
+    bottom.addView(key("🌐", c[1], 0.9f, size = 21f) { cycleLanguage() })
+    bottom.addView(key(",", c[2], 0.8f, "!", 19f) { commit(",") })
+    bottom.addView(modernSpaceKey(3.3f))
+    bottom.addView(key(".", c[2], 0.8f, "…", 19f) { commit(".") })
+    bottom.addView(key(modernEnterLabel(), 0xFF00B96B.toInt(), 1.45f, size = 20f) { enter() })
+    root.addView(bottom)
+}
+
+fun GenKeyService.modernEnterLabel(): String {
+    val info = currentInputEditorInfo
+    val action = info?.imeOptions?.and(android.view.inputmethod.EditorInfo.IME_MASK_ACTION)
+    return when (action) {
+        android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH -> "⌕"
+        android.view.inputmethod.EditorInfo.IME_ACTION_SEND -> "➤"
+        android.view.inputmethod.EditorInfo.IME_ACTION_GO -> "Go"
+        android.view.inputmethod.EditorInfo.IME_ACTION_NEXT -> "→"
+        android.view.inputmethod.EditorInfo.IME_ACTION_DONE -> "✓"
+        else -> "↵"
+    }
+}
+
+fun GenKeyService.modernSpaceKey(weight: Float): android.widget.FrameLayout {
+    val title = when (lang) { 1 -> "বাংলা"; 2 -> "Avro"; else -> "English" }
+    val bar = key("◂  $title  ▸", 0xFF20294D.toInt(), weight, size = 15f) { space() }
+    var startX = 0f
+    bar.setOnTouchListener { _, event ->
+        when (event.action) {
+            android.view.MotionEvent.ACTION_DOWN -> { startX = event.x; false }
+            android.view.MotionEvent.ACTION_UP -> {
+                if (kotlin.math.abs(event.x - startX) > dp(35)) { cycleLanguage(); true } else false
+            }
+            else -> false
+        }
+    }
+    return bar
+}
+
+fun GenKeyService.modernHideRow(): LinearLayout {
+    val r = row(34)
+    val hide = TextView(this)
+    hide.text = "⌄"
+    hide.textSize = 25f
+    hide.gravity = Gravity.CENTER
+    hide.setTextColor(0xFFE6E9FF.toInt())
+    val shape = android.graphics.drawable.GradientDrawable(
+        android.graphics.drawable.GradientDrawable.Orientation.LEFT_RIGHT,
+        intArrayOf(0xFF17123B.toInt(), 0xFF101C39.toInt()))
+    shape.cornerRadius = dp(20).toFloat()
+    hide.background = shape
+    r.addView(hide, LinearLayout.LayoutParams(MATCH, MATCH))
+    hide.setOnClickListener { requestHideSelf(0) }
+    return r
+}
