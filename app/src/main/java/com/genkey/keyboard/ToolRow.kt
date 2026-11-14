@@ -140,7 +140,8 @@ fun GenKeyService.modernToolbarRow(): View {
             "😊" to { layer = 2; render() },
             "⠿" to { layer = if (layer == 1) 0 else 1; render() },
             "文A" to { cycleLanguage() },
-            "🎤" to { if (VoiceHolder.state == VoiceState.LISTENING) stopVoice() else voice() }
+            "🎤" to { if (VoiceHolder.state == VoiceState.LISTENING) stopVoice() else voice() },
+            "⌄" to { requestHideSelf(0) }
         )
 
         val collapse = TextView(this)
