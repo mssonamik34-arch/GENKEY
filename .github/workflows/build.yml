@@ -4,6 +4,8 @@ name: Build APK
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -36,7 +38,15 @@ jobs:
       - name: Build debug APK
         run: gradle assembleDebug
 
+      - name: Upload APK build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GENKEY-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+
       - name: Publish direct APK download
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: ncipollo/release-action@v1
         with:
           tag: latest
