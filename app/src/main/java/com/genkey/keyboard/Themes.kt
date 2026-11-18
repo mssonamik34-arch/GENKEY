@@ -26,7 +26,7 @@ object Themes {
         KTheme("Inter Milan", 0xFF071323.toInt(), listOf(0xFF0068A8.toInt(), 0xFF000000.toInt(), 0xFF00AEEF.toInt(), 0xFFFFFFFF.toInt(), 0xFF1B3155.toInt())),
         KTheme("AC Milan", 0xFF180909.toInt(), listOf(0xFFFB090B.toInt(), 0xFF111111.toInt(), 0xFFFFFFFF.toInt(), 0xFF8B0000.toInt(), 0xFF555555.toInt())),
         KTheme("Juventus", 0xFF101010.toInt(), listOf(0xFFFFFFFF.toInt(), 0xFF1B1B1B.toInt(), 0xFFDADADA.toInt(), 0xFF777777.toInt(), 0xFFF5F5F5.toInt())),
-        KTheme("Neon Glass", 0xFF070A18.toInt(), listOf(0xFF3546A8.toInt(), 0xFF29365F.toInt(), 0xFF151D3A.toInt(), 0xFFB9C7FF.toInt(), 0xFF00C878.toInt()))
+        KTheme("Neon Glass", 0xFF070A18.toInt(), listOf(0xFF3546A8.toInt(), 0xFF29365F.toInt(), 0xFF151D3A.toInt(), 0xFFB9C7FF.toInt(), 0xFF00C878.toInt())),
         KTheme("Pixel Arcade", 0xFF101820.toInt(), listOf(0xFFFFD700.toInt(), 0xFF00E5FF.toInt(), 0xFF202B38.toInt(), 0xFFF5F5F5.toInt(), 0xFFFF4D6D.toInt())),
         KTheme("Sakura", 0xFF251722.toInt(), listOf(0xFFFFB7C5.toInt(), 0xFFFFE0E8.toInt(), 0xFF6C4057.toInt(), 0xFFFFFFFF.toInt(), 0xFFCC6688.toInt())),
         KTheme("Ocean", 0xFF061A2B.toInt(), listOf(0xFF00B4D8.toInt(), 0xFF90E0EF.toInt(), 0xFF12344A.toInt(), 0xFFFFFFFF.toInt(), 0xFF0077B6.toInt())),
