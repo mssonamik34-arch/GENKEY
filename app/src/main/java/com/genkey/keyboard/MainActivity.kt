@@ -358,8 +358,7 @@ class MainActivity : Activity() {
         scEdit = EditText(this)
         scEdit.setTextColor(Color.WHITE)
         scEdit.setHintTextColor(0xFF777777.toInt())
-        scEdit.hint = "brb=be right back
-addr=আমার ঠিকানা"
+        scEdit.hint = "brb=be right back\naddr=আমার ঠিকানা"
         scEdit.setText(sp.getString("shortcuts", ""))
         scEdit.minLines = 3
         scEdit.inputType =
