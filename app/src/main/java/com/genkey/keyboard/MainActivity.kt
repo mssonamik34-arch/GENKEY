@@ -99,14 +99,14 @@ class MainActivity : Activity() {
     ) {
         val key = TextView(this)
         key.text = text
-        key.textSize = 10f
+        key.textSize = sp.getInt("preview_key_size", 10).toFloat()
         key.gravity = Gravity.CENTER
         key.setTextColor(Themes.textOn(color))
         key.typeface = Typeface.DEFAULT_BOLD
 
         val shape = GradientDrawable()
         shape.setColor(color)
-        shape.cornerRadius = dp(5).toFloat()
+        shape.cornerRadius = dp(when (sp.getInt("key_shape", 0)) { 0 -> 3; 1 -> 8; else -> 14 }).toFloat()
         key.background = shape
 
         val lp = LinearLayout.LayoutParams(0, dp(27), weight)
@@ -249,12 +249,12 @@ class MainActivity : Activity() {
         title("⌨️ Keyboard Layout & Shape")
         choice(listOf("Classic Layout", "New Layout"), "layout_mode", 0)
 
-        title("🎨 Themes & Appearance")
+        title("🎨 Themes & Appearance")\n        title("Live Preview")\n        box.addView(themePreview(Themes.get(sp.getInt("theme", 0))))\n        val customButton = Button(this)\n        customButton.text = "🎨 Custom Color Picker / Wallpaper"\n        customButton.setOnClickListener { startActivity(Intent(this, ThemeGalleryActivity::class.java)) }\n        box.addView(customButton)
         switchRow("Compact toolbar", "compact_toolbar", true)
         switchRow("Animated microphone while listening", "mic_animation", true)
         choice(listOf("Square keys", "Soft corners", "Rounded keys"), "key_shape", 0)
         choice(listOf("Standard font", "Pixel font", "Bold font"), "key_font", 0)
-        choice(listOf("Tight spacing", "Normal spacing", "Wide spacing"), "key_spacing", 1)
+        choice(listOf("Tight spacing", "Normal spacing", "Wide spacing"), "key_spacing", 1)\n        title("Key preview size")\n        val sizeLabel = TextView(this)\n        sizeLabel.setTextColor(Color.WHITE)\n        sizeLabel.text = "${sp.getInt("preview_key_size", 10)} px"\n        box.addView(sizeLabel)\n        val sizeSlider = SeekBar(this)\n        sizeSlider.max = 10\n        sizeSlider.progress = sp.getInt("preview_key_size", 10) - 8\n        sizeSlider.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {\n            override fun onProgressChanged(s: SeekBar?, progress: Int, fromUser: Boolean) {\n                val value = progress + 8\n                sizeLabel.text = "$value px"\n                sp.edit().putInt("preview_key_size", value).apply()\n            }\n            override fun onStartTrackingTouch(s: SeekBar?) {}\n            override fun onStopTrackingTouch(s: SeekBar?) {}\n        })\n        box.addView(sizeSlider)
         val themesButton = Button(this)
         themesButton.text = "🎨 Theme Gallery খুলুন"
         themesButton.setOnClickListener { startActivity(Intent(this, ThemeGalleryActivity::class.java)) }
