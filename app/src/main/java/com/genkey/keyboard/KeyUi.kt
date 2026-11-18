@@ -101,14 +101,14 @@ fun GenKeyService.key(
     val green = ((Color.green(bg) * 1.12f).toInt()).coerceAtMost(255)
     val blue = ((Color.blue(bg) * 1.12f).toInt()).coerceAtMost(255)
     val topColor = Color.rgb(red, green, blue)
-    shape.cornerRadius = dp(if (sp.getInt("layout_mode", 0) == 1) 14 else 11).toFloat()
+    shape.cornerRadius = dp(when (sp.getInt("key_shape", 0)) { 0 -> 3; 1 -> 8; else -> 14 }).toFloat()
     shape.orientation = GradientDrawable.Orientation.TOP_BOTTOM
     shape.colors = intArrayOf(topColor, bg)
     shape.setStroke(dp(1), 0x45FFFFFF)
     f.background = shape
     f.elevation = dp(3).toFloat()
     val lp = LinearLayout.LayoutParams(0, MATCH, weight)
-    lp.setMargins(dp(2), dp(3), dp(2), dp(4))
+    val spacing = when (sp.getInt("key_spacing", 1)) { 0 -> 1; 2 -> 4; else -> 2 }\n    lp.setMargins(dp(spacing), dp(3), dp(spacing), dp(4))
     f.layoutParams = lp
 
     val fg = Themes.textOn(bg)
@@ -116,7 +116,7 @@ fun GenKeyService.key(
     main.text = label
     main.setTextColor(fg)
     main.textSize = size
-    main.typeface = if (label.all { it.code < 128 }) Typeface.create(keyFont, Typeface.BOLD) else Typeface.DEFAULT
+    main.typeface = if (label.all { it.code < 128 }) when (sp.getInt("key_font", 0)) { 1 -> Typeface.create("monospace", Typeface.BOLD); 2 -> Typeface.create(keyFont, Typeface.BOLD); else -> Typeface.create(keyFont, Typeface.BOLD) } else Typeface.DEFAULT
     main.gravity = Gravity.CENTER
     f.addView(main, FrameLayout.LayoutParams(MATCH, MATCH))
 
