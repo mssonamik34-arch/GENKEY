@@ -99,14 +99,14 @@ class MainActivity : Activity() {
     ) {
         val key = TextView(this)
         key.text = text
-        key.textSize = 10f
+        key.textSize = sp.getInt("preview_key_size", 10).toFloat()
         key.gravity = Gravity.CENTER
         key.setTextColor(Themes.textOn(color))
         key.typeface = Typeface.DEFAULT_BOLD
 
         val shape = GradientDrawable()
         shape.setColor(color)
-        shape.cornerRadius = dp(5).toFloat()
+        shape.cornerRadius = dp(when (sp.getInt("key_shape", 0)) { 0 -> 3; 1 -> 8; else -> 14 }).toFloat()
         key.background = shape
 
         val lp = LinearLayout.LayoutParams(0, dp(27), weight)
@@ -246,10 +246,39 @@ class MainActivity : Activity() {
         }
         box.addView(b2)
 
-        title("Keyboard Layout")
+        title("⌨️ Keyboard Layout & Shape")
         choice(listOf("Classic Layout", "New Layout"), "layout_mode", 0)
 
-        title("থিম ও ওয়ালপেপার")
+        title("🎨 Themes & Appearance")
+        title("Live Preview")
+        box.addView(themePreview(Themes.get(sp.getInt("theme", 0))))
+        val customButton = Button(this)
+        customButton.text = "🎨 Custom Color Picker / Wallpaper"
+        customButton.setOnClickListener { startActivity(Intent(this, ThemeGalleryActivity::class.java)) }
+        box.addView(customButton)
+        switchRow("Compact toolbar", "compact_toolbar", true)
+        switchRow("Animated microphone while listening", "mic_animation", true)
+        choice(listOf("Square keys", "Soft corners", "Rounded keys"), "key_shape", 0)
+        choice(listOf("Standard font", "Pixel font", "Bold font"), "key_font", 0)
+        choice(listOf("Tight spacing", "Normal spacing", "Wide spacing"), "key_spacing", 1)
+        title("Key preview size")
+        val sizeLabel = TextView(this)
+        sizeLabel.setTextColor(Color.WHITE)
+        sizeLabel.text = "${sp.getInt("preview_key_size", 10)} px"
+        box.addView(sizeLabel)
+        val sizeSlider = SeekBar(this)
+        sizeSlider.max = 10
+        sizeSlider.progress = sp.getInt("preview_key_size", 10) - 8
+        sizeSlider.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(s: SeekBar?, progress: Int, fromUser: Boolean) {
+                val value = progress + 8
+                sizeLabel.text = "$value px"
+                sp.edit().putInt("preview_key_size", value).apply()
+            }
+            override fun onStartTrackingTouch(s: SeekBar?) {}
+            override fun onStopTrackingTouch(s: SeekBar?) {}
+        })
+        box.addView(sizeSlider)
         val themesButton = Button(this)
         themesButton.text = "🎨 Theme Gallery খুলুন"
         themesButton.setOnClickListener { startActivity(Intent(this, ThemeGalleryActivity::class.java)) }
@@ -261,7 +290,7 @@ class MainActivity : Activity() {
         updateButton.setOnClickListener { UpdateChecker.check(this, true) }
         box.addView(updateButton)
 
-        title("কিবোর্ডের উচ্চতা")
+        title("📐 Resize & Position")
 
         val lab = TextView(this)
         lab.setTextColor(Color.WHITE)
@@ -290,18 +319,18 @@ class MainActivity : Activity() {
         )
         box.addView(sb)
 
-        title("এক হাতে টাইপ")
+        title("🖐 One-handed mode")
         choice(
             listOf("বন্ধ", "বাঁ দিকে", "ডান দিকে"),
             "onehand",
             0
         )
-        title("ভাষা (কোনগুলো থাকবে)")
+        title("🌐 Languages")
         switchRow("English", "lang_en", true)
         switchRow("বাংলা", "lang_bn", true)
         switchRow("Avro (Banglish)", "lang_avro", true)
 
-        title("টাইপিং")
+        title("✍️ Typing & Suggestions")
 
         title("Typing Speed")
         val speedHint = TextView(this)
@@ -320,12 +349,12 @@ class MainActivity : Activity() {
         switchRow("উপরে নম্বর রো", "numrow", false)
         switchRow("কী চাপলে অক্ষর ভেসে ওঠা", "popup", true)
 
-        title("সাউন্ড ও ভাইব্রেশন")
+        title("🔊 Sound & Haptics")
         switchRow("কী সাউন্ড", "sound", true)
 
         switchRow("ভাইব্রেশন", "vib", true)
 
-        title("শর্টকাট (প্রতি লাইনে শর্ট=পুরো লেখা)")
+        title("⚡ Text Shortcuts (shortcut=full text)")
         scEdit = EditText(this)
         scEdit.setTextColor(Color.WHITE)
         scEdit.setHintTextColor(0xFF777777.toInt())
@@ -337,7 +366,7 @@ class MainActivity : Activity() {
             InputType.TYPE_TEXT_FLAG_MULTI_LINE
         box.addView(scEdit)
 
-        title("অন্যান্য")
+        title("🧰 Tools")
 
         val clear = Button(this)
         clear.text = "শেখা শব্দ মুছে ফেলো"

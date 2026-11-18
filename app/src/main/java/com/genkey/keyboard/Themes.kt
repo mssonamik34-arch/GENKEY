@@ -26,7 +26,14 @@ object Themes {
         KTheme("Inter Milan", 0xFF071323.toInt(), listOf(0xFF0068A8.toInt(), 0xFF000000.toInt(), 0xFF00AEEF.toInt(), 0xFFFFFFFF.toInt(), 0xFF1B3155.toInt())),
         KTheme("AC Milan", 0xFF180909.toInt(), listOf(0xFFFB090B.toInt(), 0xFF111111.toInt(), 0xFFFFFFFF.toInt(), 0xFF8B0000.toInt(), 0xFF555555.toInt())),
         KTheme("Juventus", 0xFF101010.toInt(), listOf(0xFFFFFFFF.toInt(), 0xFF1B1B1B.toInt(), 0xFFDADADA.toInt(), 0xFF777777.toInt(), 0xFFF5F5F5.toInt())),
-        KTheme("Neon Glass", 0xFF070A18.toInt(), listOf(0xFF3546A8.toInt(), 0xFF29365F.toInt(), 0xFF151D3A.toInt(), 0xFFB9C7FF.toInt(), 0xFF00C878.toInt()))
+        KTheme("Neon Glass", 0xFF070A18.toInt(), listOf(0xFF3546A8.toInt(), 0xFF29365F.toInt(), 0xFF151D3A.toInt(), 0xFFB9C7FF.toInt(), 0xFF00C878.toInt())),
+        KTheme("Pixel Arcade", 0xFF101820.toInt(), listOf(0xFFFFD700.toInt(), 0xFF00E5FF.toInt(), 0xFF202B38.toInt(), 0xFFF5F5F5.toInt(), 0xFFFF4D6D.toInt())),
+        KTheme("Sakura", 0xFF251722.toInt(), listOf(0xFFFFB7C5.toInt(), 0xFFFFE0E8.toInt(), 0xFF6C4057.toInt(), 0xFFFFFFFF.toInt(), 0xFFCC6688.toInt())),
+        KTheme("Ocean", 0xFF061A2B.toInt(), listOf(0xFF00B4D8.toInt(), 0xFF90E0EF.toInt(), 0xFF12344A.toInt(), 0xFFFFFFFF.toInt(), 0xFF0077B6.toInt())),
+        KTheme("Sunset", 0xFF24131C.toInt(), listOf(0xFFFF6B35.toInt(), 0xFFFFC857.toInt(), 0xFF7B2D43.toInt(), 0xFFFFF3E0.toInt(), 0xFFD1495B.toInt())),
+        KTheme("Forest", 0xFF0D1B14.toInt(), listOf(0xFF70A288.toInt(), 0xFFB7D7C0.toInt(), 0xFF1B4332.toInt(), 0xFFF1FAF4.toInt(), 0xFF40916C.toInt())),
+        KTheme("Candy", 0xFF201629.toInt(), listOf(0xFFFF70A6.toInt(), 0xFFFFC2D1.toInt(), 0xFF725AC1.toInt(), 0xFFFFFFFF.toInt(), 0xFF70D6FF.toInt())),
+        KTheme("Mono Contrast", 0xFF000000.toInt(), listOf(0xFFFFFFFF.toInt(), 0xFFCCCCCC.toInt(), 0xFF222222.toInt(), 0xFFEEEEEE.toInt(), 0xFF777777.toInt())),
     )
 
     fun get(i: Int): KTheme = list[if (i in list.indices) i else 0]
