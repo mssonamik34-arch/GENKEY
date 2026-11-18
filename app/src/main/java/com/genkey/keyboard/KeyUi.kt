@@ -108,7 +108,8 @@ fun GenKeyService.key(
     f.background = shape
     f.elevation = dp(3).toFloat()
     val lp = LinearLayout.LayoutParams(0, MATCH, weight)
-    val spacing = when (sp.getInt("key_spacing", 1)) { 0 -> 1; 2 -> 4; else -> 2 }\n    lp.setMargins(dp(spacing), dp(3), dp(spacing), dp(4))
+    val spacing = when (sp.getInt("key_spacing", 1)) { 0 -> 1; 2 -> 4; else -> 2 }
+    lp.setMargins(dp(spacing), dp(3), dp(spacing), dp(4))
     f.layoutParams = lp
 
     val fg = Themes.textOn(bg)
